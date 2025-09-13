@@ -177,7 +177,7 @@ export default function BrandFoundingLanding() {
             Business & Creativity
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-            The premier platform for fractional investment in innovative businesses and intellectual property.
+            The premier platform for fractional investment in innovative businesses, intellectual property, and iconic properties.
           </p>
           <Button asChild size="lg" className="bg-black hover:bg-gray-800 text-white text-lg px-8 py-4 shadow-lg">
             <Link href={calendlyUrl} target="_blank" rel="noopener noreferrer">
