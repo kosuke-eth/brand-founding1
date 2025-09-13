@@ -21,7 +21,7 @@ import Link from "next/link"
 import { useState } from "react"
 
 export default function BrandFoundingLanding() {
-  const calendlyUrl = "https://calendly.com/akosuke01/1-hour-meeting"
+  const calendlyUrl = "https://calendly.com/brandfouding/30min"
 
   const [showAll, setShowAll] = useState(false)
 
