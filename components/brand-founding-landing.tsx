@@ -314,8 +314,7 @@ export default function BrandFoundingLanding() {
               </div>
               <h3 className="text-3xl font-bold text-black mb-6">For Investors</h3>
               <p className="text-lg text-gray-600 leading-relaxed mb-8">
-                Diversify beyond traditional markets. Access unique, high-potential opportunities in growing businesses
-                and creative IP with transparent returns and professional oversight.
+              Diversify beyond traditional markets. Access unique, high-potential opportunities in growing businesses, creative IP, and select real estate. All opportunities are presented with transparent returns and professional oversight.
               </p>
               <ul className="space-y-3 text-gray-600 mb-8">
                 <li className="flex items-center">
@@ -339,8 +338,7 @@ export default function BrandFoundingLanding() {
               </div>
               <h3 className="text-3xl font-bold text-black mb-6">For IP & Businesses</h3>
               <p className="text-lg text-gray-600 leading-relaxed mb-8">
-                Unlock the liquidity of your assets. Gain capital from your business revenue stream or creative IP
-                without selling equity or losing control of your intellectual property.
+              Unlock the value of your assets for future growth. Secure new funding by leveraging your business revenue stream, intellectual property (IP), or real estate holdings. Gain fast access to the growth capital you need without selling equity or losing control of your valuable assets.
               </p>
               <ul className="space-y-3 text-gray-600 mb-8">
                 <li className="flex items-center">
