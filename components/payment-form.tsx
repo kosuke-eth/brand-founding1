@@ -27,6 +27,7 @@ export default function PaymentForm({ projectName, minAmount, maxAmount }: Payme
   const [referralCode, setReferralCode] = useState("")
   const [copied, setCopied] = useState(false)
   const [termsAgreed, setTermsAgreed] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const receivingAddress = "0xAb5CB0A638A676B5102a10685DC07e0748965846"
 
@@ -36,20 +37,39 @@ export default function PaymentForm({ projectName, minAmount, maxAmount }: Payme
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const handleSubmitPayment = (e: React.FormEvent) => {
+  const handleSubmitPayment = async (e: React.FormEvent) => {
     e.preventDefault()
-    alert(
-      `Payment form submitted for ${projectName}\nAmount: $${amount} USDT\nName: ${name}\nEmail: ${email}\nPhone: ${phone}\nReferral Code: ${referralCode || "None"}`,
-    )
+    setIsSubmitting(true)
+    try {
+      const res = await fetch("/api/submit-investment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectName, amount, name, email, phone, referralCode }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data?.success) {
+        alert("Failed to submit investment details. Please try again.")
+        return
+      }
+      alert("Investment details submitted successfully! You will receive confirmation within 24 hours.")
+      setAmount("")
+      setName("")
+      setEmail("")
+      setPhone("")
+      setReferralCode("")
+      setTermsAgreed(false)
+      setShowPaymentForm(false)
+    } catch (err) {
+      console.error(err)
+      alert("An error occurred while submitting your investment details. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   if (!showPaymentForm) {
     return (
-      <Button
-        onClick={() => setShowPaymentForm(true)}
-        className="w-full bg-black hover:bg-gray-800 text-white"
-        size="lg"
-      >
+      <Button onClick={() => setShowPaymentForm(true)} className="w-full bg-black hover:bg-gray-800 text-white" size="lg">
         <DollarSign className="w-5 h-5 mr-2" />
         Invest Now
       </Button>
@@ -83,9 +103,7 @@ export default function PaymentForm({ projectName, minAmount, maxAmount }: Payme
               required
               className="border-gray-300 focus:border-black"
             />
-            <p className="text-xs text-gray-500">
-              Minimum: ${minAmount.toLocaleString()} • Maximum: ${maxAmount.toLocaleString()}
-            </p>
+            <p className="text-xs text-gray-500">Minimum: ${minAmount.toLocaleString()} • Maximum: ${maxAmount.toLocaleString()}</p>
           </div>
 
           {/* Receiving Address */}
@@ -93,13 +111,7 @@ export default function PaymentForm({ projectName, minAmount, maxAmount }: Payme
             <Label className="text-sm font-medium text-black">USDT Receiving Address (Polygon Network)</Label>
             <div className="flex items-center space-x-2">
               <Input value={receivingAddress} readOnly className="bg-gray-50 border-gray-300 text-sm font-mono" />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleCopyAddress}
-                className="flex-shrink-0 bg-transparent"
-              >
+              <Button type="button" variant="outline" size="sm" onClick={handleCopyAddress} className="flex-shrink-0 bg-transparent">
                 {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
               </Button>
             </div>
@@ -108,68 +120,29 @@ export default function PaymentForm({ projectName, minAmount, maxAmount }: Payme
 
           {/* Investor Name */}
           <div className="space-y-2">
-            <Label htmlFor="name" className="text-sm font-medium text-black">
-              Full Name
-            </Label>
-            <Input
-              id="name"
-              type="text"
-              placeholder="Enter your full name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="border-gray-300 focus:border-black"
-            />
+            <Label htmlFor="name" className="text-sm font-medium text-black">Full Name</Label>
+            <Input id="name" type="text" placeholder="Enter your full name" value={name} onChange={(e) => setName(e.target.value)} required className="border-gray-300 focus:border-black" />
             <p className="text-xs text-gray-500">Name for investment documentation and correspondence</p>
           </div>
 
           {/* Email Address */}
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-sm font-medium text-black">
-              Email Address
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="Enter your email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="border-gray-300 focus:border-black"
-            />
+            <Label htmlFor="email" className="text-sm font-medium text-black">Email Address</Label>
+            <Input id="email" type="email" placeholder="Enter your email address" value={email} onChange={(e) => setEmail(e.target.value)} required className="border-gray-300 focus:border-black" />
             <p className="text-xs text-gray-500">Email for investment updates and communication</p>
           </div>
 
           {/* Phone Number */}
           <div className="space-y-2">
-            <Label htmlFor="phone" className="text-sm font-medium text-black">
-              Phone Number
-            </Label>
-            <Input
-              id="phone"
-              type="tel"
-              placeholder="Enter your phone number"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              required
-              className="border-gray-300 focus:border-black"
-            />
+            <Label htmlFor="phone" className="text-sm font-medium text-black">Phone Number</Label>
+            <Input id="phone" type="tel" placeholder="Enter your phone number" value={phone} onChange={(e) => setPhone(e.target.value)} required className="border-gray-300 focus:border-black" />
             <p className="text-xs text-gray-500">Phone number for urgent investment matters</p>
           </div>
 
           {/* Referral Code */}
           <div className="space-y-2">
-            <Label htmlFor="referralCode" className="text-sm font-medium text-black">
-              Referral Code (Optional)
-            </Label>
-            <Input
-              id="referralCode"
-              type="text"
-              placeholder="Enter referral code if you have one"
-              value={referralCode}
-              onChange={(e) => setReferralCode(e.target.value)}
-              className="border-gray-300 focus:border-black"
-            />
+            <Label htmlFor="referralCode" className="text-sm font-medium text-black">Referral Code (Optional)</Label>
+            <Input id="referralCode" type="text" placeholder="Enter referral code if you have one" value={referralCode} onChange={(e) => setReferralCode(e.target.value)} className="border-gray-300 focus:border-black" />
             <p className="text-xs text-gray-500">Optional referral code for special benefits or discounts</p>
           </div>
 
@@ -187,16 +160,9 @@ export default function PaymentForm({ projectName, minAmount, maxAmount }: Payme
 
           {/* Terms Agreement Checkbox */}
           <div className="flex items-start space-x-3 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-            <Checkbox
-              id="terms"
-              checked={termsAgreed}
-              onCheckedChange={(checked) => setTermsAgreed(checked as boolean)}
-              className="mt-1"
-            />
+            <Checkbox id="terms" checked={termsAgreed} onCheckedChange={(checked) => setTermsAgreed(checked as boolean)} className="mt-1" />
             <div className="space-y-1">
-              <Label htmlFor="terms" className="text-sm font-medium text-black cursor-pointer">
-                I agree to the Terms of Service for Crypto Asset Loan for Consumption
-              </Label>
+              <Label htmlFor="terms" className="text-sm font-medium text-black cursor-pointer">I agree to the Terms of Service for Crypto Asset Loan for Consumption</Label>
               <p className="text-xs text-gray-600">
                 <Link href="/terms" className="text-blue-600 hover:underline inline-flex items-center">
                   Read full terms and conditions
@@ -208,14 +174,9 @@ export default function PaymentForm({ projectName, minAmount, maxAmount }: Payme
 
           {/* Submit Button */}
           <div className="space-y-3">
-            <Button
-              type="submit"
-              className="w-full bg-black hover:bg-gray-800 text-white"
-              size="lg"
-              disabled={!termsAgreed}
-            >
+            <Button type="submit" className="w-full bg-black hover:bg-gray-800 text-white" size="lg" disabled={!termsAgreed || isSubmitting}>
               <User className="w-5 h-5 mr-2" />
-              Submit Investment Details
+              {isSubmitting ? 'Submitting...' : 'Submit Investment Details'}
             </Button>
             <Button type="button" variant="outline" onClick={() => setShowPaymentForm(false)} className="w-full">
               Back to Project Details
