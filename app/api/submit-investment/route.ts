@@ -1,19 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-// Use the provided Slack webhook URL directly for reliable posting during development
-const SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/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'
+// Load Slack webhook from environment
+const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL!
 
 export async function POST(request: NextRequest) {
   try {
     console.log('API route called')
-    console.log('Using SLACK_WEBHOOK_URL:', SLACK_WEBHOOK_URL)
+    console.log('Using SLACK_WEBHOOK_URL from env')
 
     const body = await request.json()
     const { projectName, amount, name, email, phone, referralCode } = body
 
-    // Create Slack message - simple text format for maximum compatibility
+    // Slack message payload
     const slackMessage = {
-      text: `💰 New Investment Details Submitted\n\n*Project:* ${projectName}\n*Amount:* $${amount} USDT\n*Investor Name:* ${name}\n*Email:* ${email}\n*Phone:* ${phone}\n*Referral Code:* ${referralCode || 'None'}\n*Submitted at:* ${new Date().toLocaleString()}`,
+      text: `💰 New Investment Details Submitted\n\n*Project:* ${projectName}\n*Amount:* $${amount} USDT\n*Investor Name:* ${name}\n*Email:* ${email}\n*Phone:* ${phone}\n*Referral Code:* ${
+        referralCode || 'None'
+      }\n*Submitted at:* ${new Date().toLocaleString()}`,
     }
 
     // Send to Slack
@@ -35,7 +37,10 @@ export async function POST(request: NextRequest) {
       throw new Error(`Slack webhook failed: ${response.statusText}`)
     }
 
-    return NextResponse.json({ success: true, message: 'Investment details sent to Slack successfully' })
+    return NextResponse.json({
+      success: true,
+      message: 'Investment details sent to Slack successfully',
+    })
   } catch (error) {
     console.error('Error sending to Slack:', error)
     return NextResponse.json(
