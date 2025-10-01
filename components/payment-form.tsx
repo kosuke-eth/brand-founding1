@@ -27,6 +27,7 @@ export default function PaymentForm({ projectName, minAmount, maxAmount }: Payme
   const [referralCode, setReferralCode] = useState("")
   const [copied, setCopied] = useState(false)
   const [termsAgreed, setTermsAgreed] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const receivingAddress = "0xAb5CB0A638A676B5102a10685DC07e0748965846"
 
@@ -36,11 +37,47 @@ export default function PaymentForm({ projectName, minAmount, maxAmount }: Payme
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const handleSubmitPayment = (e: React.FormEvent) => {
+  const handleSubmitPayment = async (e: React.FormEvent) => {
     e.preventDefault()
-    alert(
-      `Payment form submitted for ${projectName}\nAmount: $${amount} USDT\nName: ${name}\nEmail: ${email}\nPhone: ${phone}\nReferral Code: ${referralCode || "None"}`,
-    )
+    setIsSubmitting(true)
+    
+    try {
+      const response = await fetch('/api/submit-investment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          projectName,
+          amount,
+          name,
+          email,
+          phone,
+          referralCode,
+        }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        alert('Investment details submitted successfully! You will receive confirmation within 24 hours.')
+        // Reset form
+        setAmount('')
+        setName('')
+        setEmail('')
+        setPhone('')
+        setReferralCode('')
+        setTermsAgreed(false)
+        setShowPaymentForm(false)
+      } else {
+        alert('Failed to submit investment details. Please try again.')
+      }
+    } catch (error) {
+      console.error('Error submitting investment:', error)
+      alert('An error occurred while submitting your investment details. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   if (!showPaymentForm) {
@@ -212,10 +249,10 @@ export default function PaymentForm({ projectName, minAmount, maxAmount }: Payme
               type="submit"
               className="w-full bg-black hover:bg-gray-800 text-white"
               size="lg"
-              disabled={!termsAgreed}
+              disabled={!termsAgreed || isSubmitting}
             >
               <User className="w-5 h-5 mr-2" />
-              Submit Investment Details
+              {isSubmitting ? 'Submitting...' : 'Submit Investment Details'}
             </Button>
             <Button type="button" variant="outline" onClick={() => setShowPaymentForm(false)} className="w-full">
               Back to Project Details
