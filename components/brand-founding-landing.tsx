@@ -20,109 +20,29 @@ import {
 import Link from "next/link"
 import { useState } from "react"
 
-export default function BrandFoundingLanding() {
+import type { ProjectRecord } from "@/lib/notion"
+
+type Props = { projects?: ProjectRecord[] }
+
+export default function BrandFoundingLanding({ projects }: Props) {
   const calendlyUrl = "https://calendly.com/brandfouding/30min"
 
   const [showAll, setShowAll] = useState(false)
 
-  const allOpportunities = [
-    {
-      id: "sake-brewery",
-      image: "https://github.com/kosuke-eth/Brand-Founding/blob/main/public/sake-brand.jpg?raw=true",
-      badge: "Business / Traditional Craft",
-      title: "Niigata Sake Brewery Revival Project",
-      apy: "7.8%",
-      term: "24 Months",
-      goal: "$120,000",
-      progress: 100,
-      security: "Business Revenue-Backed",
-      link: "/projects/sake-brewery",
-    },
-    {
-      id: "animation-ip",
-      image: "https://github.com/kosuke-eth/Brand-Founding/blob/main/public/anime.jpg?raw=true",
-      badge: "Intellectual Property / Animation",
-      title: "Animation Original Pictures",
-      apy: "12.5%",
-      term: "36 Months",
-      goal: "$65,000",
-      progress: 100,
-      security: "IP License-Backed",
-      link: "/projects/animation-ip",
-    },
-    {
-      id: "wagyu-farm",
-      image: "https://github.com/kosuke-eth/Brand-Founding/blob/main/public/wagyu.jpg?raw=true",
-      badge: "Business / Japan",
-      title: "Kobe beef Farmers",
-      apy: "6.2%",
-      term: "48 Months",
-      goal: "$380,000",
-      progress: 100,
-      security: "Property-Backed",
-      link: "/projects/wagyu-farm",
-    },
-    {
-      id: "tech-startup",
-      image: "https://github.com/kosuke-eth/Brand-Founding/blob/main/public/anime.jpg?raw=true",
-      badge: "Technology / Startup",
-      title: "AI Healthcare Platform",
-      apy: "15.2%",
-      term: "24 Months",
-      goal: "$250,000",
-      progress: 67,
-      security: "Revenue-Backed",
-      link: "/projects/tech-startup",
-    },
-    {
-      id: "real-estate",
-      image: "https://github.com/kosuke-eth/Brand-Founding/blob/main/public/sake-brand.jpg?raw=true",
-      badge: "Real Estate / Commercial",
-      title: "Tokyo Commercial Property",
-      apy: "8.5%",
-      term: "60 Months",
-      goal: "$500,000",
-      progress: 45,
-      security: "Property-Backed",
-      link: "/projects/real-estate",
-    },
-    {
-      id: "renewable-energy",
-      image: "https://github.com/kosuke-eth/Brand-Founding/blob/main/public/wagyu.jpg?raw=true",
-      badge: "Energy / Renewable",
-      title: "Solar Farm Development",
-      apy: "9.8%",
-      term: "36 Months",
-      goal: "$750,000",
-      progress: 23,
-      security: "Asset-Backed",
-      link: "/projects/renewable-energy",
-    },
-    {
-      id: "fashion-brand",
-      image: "https://github.com/kosuke-eth/Brand-Founding/blob/main/public/anime.jpg?raw=true",
-      badge: "Fashion / Luxury",
-      title: "Sustainable Fashion Brand",
-      apy: "11.3%",
-      term: "30 Months",
-      goal: "$180,000",
-      progress: 78,
-      security: "Brand-Backed",
-      link: "/projects/fashion-brand",
-    },
-    {
-      id: "gaming-ip",
-      image: "https://github.com/kosuke-eth/Brand-Founding/blob/main/public/sake-brand.jpg?raw=true",
-      badge: "Gaming / IP",
-      title: "Mobile Game IP Rights",
-      apy: "14.7%",
-      term: "42 Months",
-      goal: "$320,000",
-      progress: 89,
-      security: "IP-Backed",
-      link: "/projects/gaming-ip",
-    },
-  ]
+  const allOpportunities = (projects || []).map((p) => ({
+    id: p.slug,
+    image: p.heroImageUrl || "/placeholder.jpg",
+    badge: p.category.join(" / ") || p.paymentMethod || "",
+    title: p.projectName,
+    apy: p.apyPercent != null ? `${p.apyPercent}%` : "-",
+    term: p.termMonths != null ? `${p.termMonths} Months` : "-",
+    goal: p.fundingGoalUsd != null ? `$${p.fundingGoalUsd.toLocaleString('en-US')}` : "-",
+    progress: (p.fundingGoalUsd && p.fundingCurrentUsd)
+      ? Math.min(100, Math.round((p.fundingCurrentUsd / p.fundingGoalUsd) * 100))
+      : 0,
+    security: p.securityType || "",
+    link: `/projects/${p.slug}`,
+  }))
 
   const displayedOpportunities = showAll ? allOpportunities : allOpportunities.slice(0, 6)
 

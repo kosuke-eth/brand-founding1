@@ -16,9 +16,10 @@ interface PaymentFormProps {
   projectName: string
   minAmount: number
   maxAmount: number
+  slug?: string
 }
 
-export default function PaymentForm({ projectName, minAmount, maxAmount }: PaymentFormProps) {
+export default function PaymentForm({ projectName, minAmount, maxAmount, slug }: PaymentFormProps) {
   const [showPaymentForm, setShowPaymentForm] = useState(false)
   const [amount, setAmount] = useState("")
   const [name, setName] = useState("")
@@ -44,7 +45,7 @@ export default function PaymentForm({ projectName, minAmount, maxAmount }: Payme
       const res = await fetch("/api/submit-investment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectName, amount, name, email, phone, referralCode }),
+        body: JSON.stringify({ projectName, amount, name, email, phone, referralCode, slug }),
       })
       const data = await res.json()
       if (!res.ok || !data?.success) {
